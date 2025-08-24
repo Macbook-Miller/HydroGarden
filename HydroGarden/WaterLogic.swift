@@ -27,7 +27,7 @@ import Foundation
 // - The data should be saved locally on the device (e.g., using UserDefaults for now).
 
 
-private class PlantState {
+class PlantState: ObservableObject {
     
     var userPoints: Int = 0
     
@@ -35,13 +35,13 @@ private class PlantState {
         case seed, sprout, leafy, complete
     }
     
-    var waterCount: Int = 0
+    @Published var waterCount: Int = 0
     var stage: Stage = .seed
     var datePlanted: Date = Date()
     var waterGoal: Int = 8
     var fullyGrown: Bool = false
     
-    private func water() {
+    func water() {
         waterCount += 1
         
         let stageProgress: Double = Double(waterCount) / Double(waterGoal)
@@ -76,4 +76,20 @@ private class PlantState {
         }
     }
     
+}
+
+func testPlantReset() {
+    let yesterday = Calendar.current.date(byAdding: .day, value:-1, to: Date())!
+    let plant = PlantState()
+    plant.datePlanted = yesterday
+    plant.waterCount = 3
+    plant.fullyGrown = true
+    
+    plant.resetIfNeeded()
+    
+    print("== Plant Reset Test ==")
+    print("Water count:", plant.waterCount)
+    print("Stage:", plant.stage)
+    print("Fully grown:", plant.fullyGrown)
+    print("Date planted:", plant.datePlanted)
 }
