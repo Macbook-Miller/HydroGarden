@@ -27,3 +27,53 @@ import Foundation
 // - The data should be saved locally on the device (e.g., using UserDefaults for now).
 
 
+private class PlantState {
+    
+    var userPoints: Int = 0
+    
+    enum Stage {
+        case seed, sprout, leafy, complete
+    }
+    
+    var waterCount: Int = 0
+    var stage: Stage = .seed
+    var datePlanted: Date = Date()
+    var waterGoal: Int = 8
+    var fullyGrown: Bool = false
+    
+    private func water() {
+        waterCount += 1
+        
+        let stageProgress: Double = Double(waterCount) / Double(waterGoal)
+        
+        if stageProgress < 0.33 {
+            stage = .seed
+        } else if stageProgress >= 0.33 && stageProgress < 0.66 {
+            stage = .sprout
+        } else if stageProgress <= 1.0 {
+            stage = .leafy
+        }
+        
+        if waterCount >= waterGoal {
+            fullyGrown = true
+            stage = .complete
+            userPoints += 10
+        }
+        
+    }
+    
+    // compare datePlanted with the current date, if they are not the same, reset all the stats
+    func resetIfNeeded() {
+        let toDay = Date()
+        
+        // Compare only the day/month/year of toDay and datePlanted
+        // If they are different, reset plan
+        if Calendar.current.isDate(datePlanted, inSameDayAs: toDay) == false {
+            waterCount = 0
+            stage = .seed
+            datePlanted = toDay
+            fullyGrown = false
+        }
+    }
+    
+}
