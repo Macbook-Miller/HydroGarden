@@ -29,37 +29,62 @@ import Foundation
 
 class PlantState: ObservableObject {
     
-    var userPoints: Int = 0
+    @Published var userPoints: Int = 0
     
     enum Stage {
         case seed, sprout, leafy, complete
     }
     
     @Published var waterCount: Int = 0
-    var stage: Stage = .seed
-    var datePlanted: Date = Date()
-    var waterGoal: Int = 8
-    var fullyGrown: Bool = false
+    @Published var stage: Stage = .seed
+    @Published var datePlanted: Date = Date()
+    @Published var waterGoal: Int = 8
+    @Published var fullyGrown: Bool = false
+    
+    var progress: Double {
+        guard waterGoal > 0 else { return 0 }
+        let raw = Double(waterCount) / Double(waterGoal)
+        return max(0.0, min(1.0,raw))
+        
+    }
+    
+    private func updateStage() {
+        switch progress {
+        case ..<0.33:
+            stage = .seed
+        case ..<0.66:
+            stage = .sprout
+        case ..<1.0:
+            stage = .leafy
+        default:
+            stage = .complete
+        }
+    }
     
     func water() {
-        waterCount += 1
+        guard !fullyGrown else { return } // prevents overscoring
+        waterCount = min(waterGoal, waterCount + 1)
         
-        let stageProgress: Double = Double(waterCount) / Double(waterGoal)
-        
-        if stageProgress < 0.33 {
-            stage = .seed
-        } else if stageProgress >= 0.33 && stageProgress < 0.66 {
-            stage = .sprout
-        } else if stageProgress <= 1.0 {
-            stage = .leafy
-        }
-        
-        if waterCount >= waterGoal {
+        if progress >= 1.0 {
             fullyGrown = true
             stage = .complete
             userPoints += 10
+        } else {
+            updateStage()
         }
         
+    }
+    
+    func unWater() {
+        if waterCount > 0 {
+            waterCount -= 1
+        } else {
+            waterCount = 0
+        }
+        if waterCount < waterGoal {
+            fullyGrown = false
+        }
+        updateStage()
     }
     
     // compare datePlanted with the current date, if they are not the same, reset all the stats
@@ -70,9 +95,9 @@ class PlantState: ObservableObject {
         // If they are different, reset plan
         if Calendar.current.isDate(datePlanted, inSameDayAs: toDay) == false {
             waterCount = 0
-            stage = .seed
-            datePlanted = toDay
             fullyGrown = false
+            datePlanted = toDay
+            updateStage()
         }
     }
     
@@ -93,3 +118,4 @@ func testPlantReset() {
     print("Fully grown:", plant.fullyGrown)
     print("Date planted:", plant.datePlanted)
 }
+
