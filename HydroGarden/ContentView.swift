@@ -27,26 +27,44 @@ struct ContentView: View {
     var body: some View {
         
         ZStack {
-            Color("retro_gray") 
+            Color("retro_gray")
                 .ignoresSafeArea()
 
             VStack {
+                
                 ZStack(alignment: .top) {
-                    Rectangle()
-                        .fill(Color.black)
-                        .frame(height: 450)
-                        .cornerRadius(12)
-                        .shadow(radius: 4)
                     
+                        Rectangle()
+                            .fill(Color.black)
+                            .frame(height: 450)
+                            .cornerRadius(12)
+                            .shadow(radius: 4)
                     SpriteView(scene: scene)
                         .ignoresSafeArea(edges: .top)
                         .frame(maxWidth: 300, maxHeight: 350)
                         .cornerRadius(6)
                         .padding(.top, 25)
-                    
-                    Text("HydroGarden")
-                        .font(.headline)
-                        .foregroundColor(.gray)
+                        // "Faked" inner shadow
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6)
+                                .strokeBorder(
+                                    LinearGradient(
+                                        colors: [
+                                            Color.black.opacity(0.55), // darker top-left edge
+                                            Color.black.opacity(0.20)  // softer bottom-right edge
+                                        ],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 4
+                                )
+                                .allowsHitTesting(false)
+                        )
+                        
+                        
+                        Text("HydroGarden")
+                            .font(.headline)
+                            .foregroundColor(.gray)
                         
                     
                 }
