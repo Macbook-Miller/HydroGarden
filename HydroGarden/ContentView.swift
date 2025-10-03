@@ -74,12 +74,6 @@ struct ContentView: View {
                 Spacer()
                 
                 
-                Image(systemName: "drop.fill")
-                    .imageScale(.large)
-                    .foregroundStyle(.tint)
-                
-                
-                
                 Text("Stage: \(String(describing: plant.stage))")
                 
                 HStack {
@@ -87,18 +81,46 @@ struct ContentView: View {
                         Image(systemName: "minus")
                             .font(.title2)
                             .foregroundColor(Color.gray)
+                            .frame(width: 80, height: 80)
                     }
-                    .buttonStyle(RetroButtonStyle(baseColor: Color.black))
+                    .buttonStyle(GlossyButtonStyle(shape: Circle(), baseColor: Color.black))
                     
                     Button(action: { plant.water() }) {
                         Image(systemName: "plus")
                             .font(.title2)
                             .foregroundColor(Color.gray)
+                            .frame(width: 80, height: 80)
                     }
-                    .buttonStyle(RetroButtonStyle(baseColor: Color.black))
+                    .buttonStyle(GlossyButtonStyle(shape: Circle(), baseColor: Color.black))
                 }
                 
-                Text("\(plant.waterCount)")
+                HStack {
+                    Text("\(plant.waterCount) / \(plant.waterGoal)")
+                    Image(systemName: "drop.fill")
+                        .imageScale(.medium)
+                        .foregroundStyle(.tint)
+                }
+                
+                VStack {
+                    Button(action: {
+                        // TODO: Menu sheet on scene
+                    }) {
+                        Text("")
+                            .font(.title2)
+                            .frame(width: 80, height: 20)
+                        
+                    }
+                    .background(
+                        Capsule()
+                            .fill(Color.black)
+                    )
+                    .buttonStyle(GlossyButtonStyle(shape: Capsule(), baseColor: Color.black))
+                    .contentShape(Capsule())
+                    
+                    Text("MENU")
+                }
+                
+                
             }
             .padding()
         }
@@ -112,42 +134,37 @@ struct ContentView: View {
         
 }
 
-struct RetroButtonStyle: ButtonStyle {
+struct GlossyButtonStyle<S: Shape>: ButtonStyle {
+    var shape: S
     var baseColor: Color = .gray
     
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .frame(width: 60, height: 60)
             .background(
-                Circle()
+                shape
                     .fill(
                         LinearGradient(
                             colors: [
-                                baseColor.opacity(0.9),
-                                baseColor.opacity(0.6)
+                                baseColor.opacity(configuration.isPressed ? 0.9 : 1.0),
+                                baseColor.opacity(configuration.isPressed ? 0.6 : 0.8)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
                     )
                     .overlay(
-                        Circle()
-                            .stroke(Color.black.opacity(0.2), lineWidth: 2)
+                        shape.stroke(Color.black.opacity(0.2), lineWidth: 2)
                     )
                     .shadow(color: .black.opacity(0.4), radius: 4, x: 2, y: 2)
-                    .shadow(color: .white.opacity(0.6), radius: 4, x: -2, y: -2)
+                    .shadow(color: .black.opacity(0.6), radius: 3, x: -2, y: -2)
             )
             .scaleEffect(configuration.isPressed ? 0.97 : 1.0)
             .animation(.spring(response: 0.3, dampingFraction: 0.5), value: configuration.isPressed)
-            .foregroundColor(.black)
-        
-            // Haptic feedback
             .onChange(of: configuration.isPressed) { _, isPressed in
                 if isPressed {
-                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 }
             }
-                
     }
 }
 
