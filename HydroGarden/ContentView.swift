@@ -85,7 +85,10 @@ struct ContentView: View {
                     }
                     .buttonStyle(GlossyButtonStyle(shape: Circle(), baseColor: Color.black.opacity(0.5)))
                     
-                    Button(action: { plant.water() }) {
+                    Button(action: {
+                        plant.water()
+                        scene.showWateringCan()
+                    }) {
                         Image(systemName: "plus")
                             .font(.title2)
                             .foregroundColor(Color.gray)

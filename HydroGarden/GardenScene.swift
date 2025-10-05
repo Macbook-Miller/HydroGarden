@@ -10,8 +10,10 @@ import SpriteKit
 
 final class GardenScene: SKScene {
     private let plantNode = SKSpriteNode()
+    private let wateringCanNode = SKSpriteNode(imageNamed: "watering1")
     
     override func didMove(to view: SKView) {
+        
         backgroundColor = .clear
         
         // Background sprite //
@@ -27,6 +29,17 @@ final class GardenScene: SKScene {
         plantNode.position = CGPoint(x: size.width / 2, y: size.height / 2)
         addChild(plantNode)
         layoutNodes()
+        
+        // Watering Can sprite
+        wateringCanNode.position = CGPoint(
+            x: size.width / 2,
+            y: size.height * 0.65 // above the plant node
+        )
+        wateringCanNode.zPosition = 5
+        wateringCanNode.isHidden = true
+        wateringCanNode.texture?.filteringMode = .nearest
+        addChild(wateringCanNode)
+        
     }
 
     override func didChangeSize(_ oldSize: CGSize) {
@@ -71,6 +84,22 @@ final class GardenScene: SKScene {
         if plantNode.texture == nil {
             plantNode.texture = texture
         }
+    }
+    
+    func showWateringCan() {
+        wateringCanNode.isHidden = false
+        wateringCanNode.alpha = 0
+        
+        let appear = SKAction.fadeIn(withDuration: 0.2)
+        let wait = SKAction.wait(forDuration: 1.7)
+        let disappear = SKAction.fadeOut(withDuration: 0.3)
+        let hide = SKAction.run {
+            [weak self] in self?.wateringCanNode.isHidden = true
+        }
+        
+        wateringCanNode.run(.sequence([appear, wait, disappear, hide]))
+        
+        
     }
     
     
