@@ -88,6 +88,7 @@ struct ContentView: View {
                     Button(action: {
                         plant.water()
                         scene.showWateringCan()
+                        
                     }) {
                         Image(systemName: "plus")
                             .font(.title2)
@@ -131,7 +132,9 @@ struct ContentView: View {
             scene.render(stage: plant.stage)
         }
         .onChange(of: plant.stage) { _, newStage in
-            scene.render(stage: newStage)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                scene.render(stage: newStage)
+            }
         }
     }
         

@@ -11,6 +11,13 @@ import SpriteKit
 final class GardenScene: SKScene {
     private let plantNode = SKSpriteNode()
     private let wateringCanNode = SKSpriteNode(imageNamed: "watering1")
+    private let wateringFrames: [SKTexture] = {
+        let names = ["watering1", "watering2"]
+        let textures = names.map { SKTexture(imageNamed: $0) }
+        textures.forEach { $0.filteringMode = .nearest }
+        return textures
+    }()
+    private var isWateringPlaying = false
     
     override func didMove(to view: SKView) {
         
@@ -32,7 +39,7 @@ final class GardenScene: SKScene {
         
         // Watering Can sprite
         wateringCanNode.position = CGPoint(
-            x: size.width / 2,
+            x: size.width / 2 - 15, // SEcond value moves the watering can left in the scene
             y: size.height * 0.65 // above the plant node
         )
         wateringCanNode.zPosition = 5
@@ -74,30 +81,50 @@ final class GardenScene: SKScene {
         texture.filteringMode = .nearest
 
         // Swap texture and added a small “pop” animation to make it feel alive.
-        plantNode.run(.group([
+        let delay = SKAction.wait(forDuration: 0.05)
+        let changeTexture = SKAction.group([
             .setTexture(texture, resize: false),
             .sequence([
                 .scale(to: 1.05, duration: 0.08),
                 .scale(to: 1.0, duration: 0.08)
             ])
-        ]))
+        ])
+        
+        plantNode.run(.sequence([delay, changeTexture]))
+        
         if plantNode.texture == nil {
             plantNode.texture = texture
         }
     }
     
     func showWateringCan() {
+        wateringCanNode.removeAllActions()
+        isWateringPlaying = true
         wateringCanNode.isHidden = false
         wateringCanNode.alpha = 0
         
+        let animate = SKAction.animate(with: wateringFrames, timePerFrame: 0.15)
+        let totalDuration: Double = 2.0
+        let frameDuration = 0.15
+        let cycleDuration = frameDuration * Double(wateringFrames.count)
+        let cycles = max(1, Int(ceil(totalDuration / cycleDuration)))
+        let loop = SKAction.repeat(animate, count: cycles)
+        
         let appear = SKAction.fadeIn(withDuration: 0.2)
-        let wait = SKAction.wait(forDuration: 1.7)
+        let wait = SKAction.wait(forDuration: 0.0)
         let disappear = SKAction.fadeOut(withDuration: 0.3)
-        let hide = SKAction.run {
-            [weak self] in self?.wateringCanNode.isHidden = true
+        let finish = SKAction.run { [weak self] in
+            self?.wateringCanNode.removeAllActions()
+            self?.wateringCanNode.isHidden = true
+            self?.isWateringPlaying = false
         }
         
-        wateringCanNode.run(.sequence([appear, wait, disappear, hide]))
+        wateringCanNode.run(.sequence([
+            .group([loop, appear]),
+            wait,
+            disappear,
+            finish
+        ]))
         
         
     }
