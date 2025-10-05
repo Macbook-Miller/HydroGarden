@@ -83,7 +83,7 @@ struct ContentView: View {
                             .foregroundColor(Color.gray)
                             .frame(width: 80, height: 80)
                     }
-                    .buttonStyle(GlossyButtonStyle(shape: Circle(), baseColor: Color.black))
+                    .buttonStyle(GlossyButtonStyle(shape: Circle(), baseColor: Color.black.opacity(0.5)))
                     
                     Button(action: { plant.water() }) {
                         Image(systemName: "plus")
@@ -91,7 +91,7 @@ struct ContentView: View {
                             .foregroundColor(Color.gray)
                             .frame(width: 80, height: 80)
                     }
-                    .buttonStyle(GlossyButtonStyle(shape: Circle(), baseColor: Color.black))
+                    .buttonStyle(GlossyButtonStyle(shape: Circle(), baseColor: Color.black.opacity(0.5)))
                 }
                 
                 HStack {
@@ -112,9 +112,9 @@ struct ContentView: View {
                     }
                     .background(
                         Capsule()
-                            .fill(Color.black)
+                            .fill(Color.black.opacity(0.1))
                     )
-                    .buttonStyle(GlossyButtonStyle(shape: Capsule(), baseColor: Color.black))
+                    .buttonStyle(GlossyButtonStyle(shape: Capsule(), baseColor: Color.black.opacity(0.5)))
                     .contentShape(Capsule())
                     
                     Text("MENU")
